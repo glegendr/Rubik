@@ -18,7 +18,8 @@ main = do
         otherwise -> return ()
     let shuffle = getShuffle lexed
     putStrLn $ show $ map toMove shuffle
-    putAnimatedCube newCube [moveR, moveU, moveR', moveU']
+    putAnimatedCube True newCube [moveR, moveU, moveR', moveU']
+    {--rtxOnCube newCube--}
     {--putCubeColor $ moveR newCube
     putCubeColor $ moveU $ moveR newCube
     putCubeColor $ moveR' $ moveU $ moveR newCube
@@ -36,10 +37,16 @@ alert str = do
     putStrLn $ "Error: " ++ str 
     exitWith (ExitFailure 2)
 
-putAnimatedCube :: Cube -> [(Cube -> Cube)] -> IO ()
-putAnimatedCube cube [] = putCubeColor cube
-putAnimatedCube cube (x:xs) = do
+putAnimatedCube :: Bool -> Cube -> [(Cube -> Cube)] -> IO ()
+putAnimatedCube False cube [] = putCubeColor cube
+putAnimatedCube True cube [] = rtxOnCube cube
+putAnimatedCube False cube (x:xs) = do
     putCubeColor cube
     cursorUpLine 15
     threadDelay 500000
-    putAnimatedCube (x cube) xs
+    putAnimatedCube False (x cube) xs
+putAnimatedCube True cube (x:xs) = do
+    rtxOnCube cube
+    cursorUpLine 41
+    threadDelay 500000
+    putAnimatedCube True (x cube) xs
