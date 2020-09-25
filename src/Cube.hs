@@ -1,5 +1,9 @@
 module Cube
-( newCube
+( Cube
+, newCube
+, cubeToString
+, putCube
+, putCubeColor
 , moveF
 , moveF2
 , moveF'
@@ -21,23 +25,27 @@ module Cube
 ) where
 
 import Moves
+import Data.List
+import Data.Text (pack)
+import Data.Function ((&))
+import Rainbow
 {--
    
-   |OOO|    |     OOW 
-   |O2O|    |     OOW
-   |OOO|    |     OOW
----|---|--- |        
-GGG|WWW|012 | GGG WWR 258    
-G1G|WWW|345 | GGG WWR 1B7  
-GGG|WWW|678 | GGG WWR 036  
----|---|--- |     
-   |RRR|    |     RRY
-   |R4R|    |     RRY
-   |RRR|    |     RRY
-   |---|    |     
-   |YYY|    |     YYO
-   |Y5Y|    |     YYO
-   |YYY|    |     YYO
+   |OOO|    |         | O  O  W | 
+   |O2O|    |         | O  O  W |
+   |OOO|    |         | O  O  W |
+---|---|--- | ------- | ------- | -------
+GGG|WWW|012 | G  G  G | W  W  R | 2  5  8    
+G1G|WWW|345 | G  G  G | W  W  R | 1  B  7  
+GGG|WWW|678 | G  G  G | W  W  R | 0  3  6  
+---|---|--- | ------- | ------- | -------
+   |RRR|    |         | R  R  Y |
+   |R4R|    |         | R  R  Y |
+   |RRR|    |         | R  R  Y |
+   |---|    |         | ------- |
+   |YYY|    |         | Y  Y  O |
+   |Y5Y|    |         | Y  Y  O |
+   |YYY|    |         | Y  Y  O |
 --}
 type Cube = [String]
 
@@ -52,6 +60,56 @@ backFace = 5
 
 newCube :: Cube
 newCube = ["WWWWWWWWW", "GGGGGGGGG", "OOOOOOOOO", "BBBBBBBBB", "RRRRRRRRR", "YYYYYYYYY"]
+
+cubeToString :: Cube -> String
+cubeToString (ff:lf:uf:rf:df:bf:[]) =
+    upPatron ++ centralBar ++ middlePatron ++ centralBar ++ downPatron1 ++ downBar ++ downPatron2 
+    where
+        centralBar = "------- | ------- | -------\n "
+        downBar = "        | ------- |\n"
+        upPatron = foldl1 (++) $ zipWith (++) ["         | ", " |\n         | ", " |\n         | "," |\n"] $ (map (intercalate "  ") $ cutBy3 uf) ++ [" "]
+        downPatron1 = foldl1 (++) $ zipWith (++) ["        | ", " |\n         | ", " |\n         | "," |\n"] $ (map (intercalate "  ") $ cutBy3 df) ++ [" "]
+        downPatron2 = reverse $ drop 1 $ reverse $ foldl1 (++) $ zipWith (++) ["         | ", " |\n         | ", " |\n         | "," |\n"] $ (map (intercalate "  ") $ cutBy3 bf) ++ [" "]
+        face0 = map (intercalate "  ") $ cutBy3 ff
+        face1 = map (intercalate "  ") $ cutBy3 lf
+        face3 = map (intercalate "  ") $ cutBy3 rf
+        middlePatron = foldl1 (++) $ zipWith5 (\ a b c d e -> a ++ d ++ b ++ d ++ c ++ e) face1 face0 face3 [" | ", " | ", " | "] ["\n ", "\n ", "\n "]
+        cutBy3 :: String -> [[String]]
+        cutBy3 [] = []
+        cutBy3 (x:y:z:xs) = [[x], [y], [z]] : cutBy3 xs
+cubeToString _ = []
+
+putCube :: Cube -> IO ()
+putCube = putStr . cubeToString
+
+putCubeColor :: Cube -> IO ()
+putCubeColor = putCubeColor' . cubeToString
+
+putCubeColor' :: String -> IO ()
+putCubeColor' [] = return ()
+putCubeColor' (x:xs)
+    | x == 'W' = do
+        putChunk $ (chunk $ pack ['■']) & fore white & bold
+        putCubeColor' xs
+    | x == 'G' = do
+        putChunk $ (chunk $ pack ['■']) & fore green & bold
+        putCubeColor' xs
+    | x == 'O' = do
+        putChunk $ (chunk $ pack ['■']) & fore magenta & bold
+        putCubeColor' xs
+    | x == 'B' = do
+        putChunk $ (chunk $ pack ['■']) & fore blue & bold
+        putCubeColor' xs
+    | x == 'R' = do
+        putChunk $ (chunk $ pack ['■']) & fore red & bold
+        putCubeColor' xs
+    | x == 'Y' = do
+        putChunk $ (chunk $ pack ['■']) & fore yellow & bold
+        putCubeColor' xs
+    | otherwise = do
+        putChar x 
+        putCubeColor' xs
+
 
 moveF :: Cube -> Cube
 moveF myCube = face0:face1:face2:face3:face4:(myCube !! backFace):[]
