@@ -1,5 +1,6 @@
 module Moves
     ( Move(..)
+    , Option(..)
     , toMove
     ) where
 

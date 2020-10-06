@@ -1,5 +1,6 @@
 module Cube
 ( Cube
+, Face
 , rtxOnCube
 , newCube
 , cubeToString
@@ -23,6 +24,13 @@ module Cube
 , moveB
 , moveB2
 , moveB'
+, frontFace
+, leftFace
+, upFace
+, rightFace
+, downFace
+, backFace
+, moveToAction
 ) where
 
 import Moves
@@ -48,7 +56,8 @@ GGG|WWW|678 | G  G  G | W  W  R | 0  3  6
    |Y5Y|    |         | Y  Y  O |
    |YYY|    |         | Y  Y  O |
 --}
-type Cube = [String]
+type Face = String
+type Cube = [Face]
 
 allMoves = ["F", "F\'", "F2", "R", "R\'", "R2", "U", "U\'", "U2", "B", "B\'", "B2", "L", "L\'", "L2", "D", "D\'", "D2"]
 
@@ -62,7 +71,7 @@ backFace = 5
 newCube :: Cube
 newCube = ["WWWWWWWWW", "GGGGGGGGG", "OOOOOOOOO", "BBBBBBBBB", "RRRRRRRRR", "YYYYYYYYY"]
 
-cubeToString :: Cube -> String
+cubeToString :: Cube -> Face
 cubeToString (ff:lf:uf:rf:df:bf:[]) =
     upPatron ++ centralBar ++ middlePatron ++ centralBar ++ downPatron1 ++ downBar ++ downPatron2 
     where
@@ -134,9 +143,9 @@ moveF myCube = face0:face1:face2:face3:face4:(myCube !! backFace):[]
     where
         face0 = [myCube !! frontFace !! 6, myCube !! frontFace !! 3, myCube !! frontFace !! 0, myCube !! frontFace !! 7, myCube !! frontFace !! 4, myCube !! frontFace !! 1, myCube !! frontFace !! 8, myCube !! frontFace !! 5, myCube !! frontFace !! 2]
         face1 = [myCube !! leftFace !! 0, myCube !! leftFace !! 1, myCube !! downFace !! 0, myCube !! leftFace !! 3, myCube !! leftFace !! 4, myCube !! downFace !! 1, myCube !! leftFace !! 6, myCube !! leftFace !! 7, myCube !! downFace !! 2]
-        face2 = take 6 (myCube !! upFace) ++ [myCube !! leftFace !! 2, myCube !! leftFace !! 5, myCube !! leftFace !! 8]
+        face2 = take 6 (myCube !! upFace) ++ [myCube !! leftFace !! 8, myCube !! leftFace !! 5, myCube !! leftFace !! 2]
         face3 = [myCube !! upFace !! 6, myCube !! rightFace !! 1, myCube !! rightFace !! 2, myCube !! upFace !! 7, myCube !! rightFace !! 4, myCube !! rightFace !! 5, myCube !! upFace !! 8, myCube !! rightFace !! 7, myCube !! rightFace !! 8]
-        face4 = [myCube !! rightFace !! 0, myCube !! rightFace !! 3, myCube !! rightFace !! 6] ++ drop 3 (myCube !! downFace)
+        face4 = [myCube !! rightFace !! 6, myCube !! rightFace !! 3, myCube !! rightFace !! 0] ++ drop 3 (myCube !! downFace)
 
 moveF2 :: Cube -> Cube
 moveF2 = moveF . moveF
@@ -176,7 +185,7 @@ moveL myCube =  face0:face1:face2:(myCube !! rightFace):face4:face5:[]
     where
         face0 = [myCube !! upFace !! 0, myCube !! frontFace !! 1, myCube !! frontFace !! 2, myCube !! upFace !! 3, myCube !! frontFace !! 4, myCube !! frontFace !! 5, myCube !! upFace !! 6, myCube !! frontFace !! 7, myCube !! frontFace !! 8]
         face1 = [myCube !! leftFace !! 6, myCube !! leftFace !! 3, myCube !! leftFace !! 0, myCube !! leftFace !! 7, myCube !! leftFace !! 4, myCube !! leftFace !! 1, myCube !! leftFace !! 8, myCube !! leftFace !! 5, myCube !! leftFace !! 2]
-        face2 = [myCube !! backFace !! 8, myCube !! upFace !! 1, myCube !! upFace !! 2, myCube !! backFace !! 5, myCube !! upFace !! 4, myCube !! upFace !! 5, myCube !! backFace !! 2, myCube !! upFace !! 7, myCube !! upFace !! 8]
+        face2 = [myCube !! backFace !! 0, myCube !! upFace !! 1, myCube !! upFace !! 2, myCube !! backFace !! 3, myCube !! upFace !! 4, myCube !! upFace !! 5, myCube !! backFace !! 6, myCube !! upFace !! 7, myCube !! upFace !! 8]
         face4 = [myCube !! frontFace !! 0, myCube !! downFace !! 1, myCube !! downFace !! 2, myCube !! frontFace !! 3, myCube !! downFace !! 4, myCube !! downFace !! 5, myCube !! frontFace !! 6, myCube !! downFace !! 7, myCube !! downFace !! 8]
         face5 = [myCube !! downFace !! 0, myCube !! backFace !! 1, myCube !! backFace !! 2, myCube !! downFace !! 3, myCube !! backFace !! 4, myCube !! backFace !! 5, myCube !! downFace !! 6, myCube !! backFace !! 7, myCube !! backFace !! 8]
 
@@ -189,7 +198,7 @@ moveL' myCube = face0:face1:face2:(myCube !! rightFace):face4:face5:[]
         face0 = [myCube !! downFace !! 0, myCube !! frontFace !! 1, myCube !! frontFace !! 2, myCube !! downFace !! 3, myCube !! frontFace !! 4, myCube !! frontFace !! 5, myCube !! downFace !! 6, myCube !! frontFace !! 7, myCube !! frontFace !! 8]
         face1 = [myCube !! leftFace !! 2, myCube !! leftFace !! 5, myCube !! leftFace !! 8, myCube !! leftFace !! 1, myCube !! leftFace !! 4, myCube !! leftFace !! 7, myCube !! leftFace !! 0, myCube !! leftFace !! 3, myCube !! leftFace !! 6]
         face2 = [myCube !! frontFace !! 0, myCube !! upFace !! 1, myCube !! upFace !! 2, myCube !! frontFace !! 3, myCube !! upFace !! 4, myCube !! upFace !! 5, myCube !! frontFace !! 6, myCube !! upFace !! 7, myCube !! upFace !! 8]
-        face4 = [myCube !! backFace !! 8, myCube !! downFace !! 1, myCube !! downFace !! 2, myCube !! backFace !! 5, myCube !! downFace !! 4, myCube !! downFace !! 5, myCube !! backFace !! 2, myCube !! downFace !! 7, myCube !! downFace !! 8]
+        face4 = [myCube !! backFace !! 0, myCube !! downFace !! 1, myCube !! downFace !! 2, myCube !! backFace !! 3, myCube !! downFace !! 4, myCube !! downFace !! 5, myCube !! backFace !! 6, myCube !! downFace !! 7, myCube !! downFace !! 8]
         face5 = [myCube !! upFace !! 0, myCube !! backFace !! 1, myCube !! backFace !! 2, myCube !! upFace !! 3, myCube !! backFace !! 4, myCube !! backFace !! 5, myCube !! upFace !! 6, myCube !! backFace !! 7, myCube !! backFace !! 8]
 
 moveU :: Cube -> Cube
@@ -254,3 +263,23 @@ moveB' myCube = (myCube !! frontFace):face1:face2:face3:face4:face5:[]
         face3 = [myCube !! rightFace !! 0, myCube !! rightFace !! 1, myCube !! upFace !! 0, myCube !! rightFace !! 3, myCube !! rightFace !! 4, myCube !! upFace !! 1, myCube !! rightFace !! 6, myCube !! rightFace !! 7, myCube !! upFace !! 2]
         face4 = [myCube !! downFace !! 0, myCube !! downFace !! 1, myCube !! downFace !! 2, myCube !! downFace !! 3, myCube !! downFace !! 4, myCube !! downFace !! 5, myCube !! rightFace !! 8, myCube !! rightFace !! 5, myCube !! rightFace !! 2]
         face5 = [myCube !! backFace !! 2, myCube !! backFace !! 5, myCube !! backFace !! 8, myCube !! backFace !! 1, myCube !! backFace !! 4, myCube !! backFace !! 7, myCube !! backFace !! 0, myCube !! backFace !! 3, myCube !! backFace !! 6]
+
+moveToAction :: Move -> (Cube -> Cube)
+moveToAction (MFront ONothing) = moveF
+moveToAction (MFront OStrokes) = moveF2
+moveToAction (MFront ODirection) = moveF'
+moveToAction (MRight ONothing) = moveR
+moveToAction (MRight OStrokes) = moveR2
+moveToAction (MRight ODirection) = moveR'
+moveToAction (MUp ONothing) = moveU
+moveToAction (MUp OStrokes) = moveU2
+moveToAction (MUp ODirection) = moveU'
+moveToAction (MBack ONothing) = moveB
+moveToAction (MBack OStrokes) = moveB2
+moveToAction (MBack ODirection) = moveB'
+moveToAction (MLeft ONothing) = moveL
+moveToAction (MLeft OStrokes) = moveL2
+moveToAction (MLeft ODirection) = moveL'
+moveToAction (MDown ONothing) = moveD
+moveToAction (MDown OStrokes) = moveD2
+moveToAction (MDown ODirection) = moveD'
