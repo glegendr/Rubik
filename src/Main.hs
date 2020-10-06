@@ -7,6 +7,7 @@ import System.Exit
 import System.Console.ANSI
 import Control.Concurrent
 import Cube
+import Algo
 
 
 main :: IO ()
@@ -18,7 +19,9 @@ main = do
         otherwise -> return ()
     let shuffle = getShuffle lexed
     putStrLn $ show $ map toMove shuffle
-    putAnimatedCube True newCube [moveR, moveU, moveR', moveU']
+    testAll
+    --putInteractive newCube
+    {-- putAnimatedCube False newCube [moveR, moveU, moveR', moveU'] --}
     {--rtxOnCube newCube--}
     {--putCubeColor $ moveR newCube
     putCubeColor $ moveU $ moveR newCube
@@ -50,3 +53,19 @@ putAnimatedCube True cube (x:xs) = do
     cursorUpLine 41
     threadDelay 500000
     putAnimatedCube True (x cube) xs
+
+putInteractive :: Cube -> IO ()
+putInteractive cube = do
+    l <- getLine
+    let lexed = lexMe [l]
+    case head lexed of
+        LexError str -> do
+            putStrLn $ "Error: " ++ str
+            putInteractive cube
+        otherwise -> return ()
+    let shuffle = getShuffle lexed
+    let myMove = head $ map toMove shuffle
+    let movedCube = (moveToAction myMove) cube
+    cursorUpLine 16
+    putCubeColor movedCube
+    putInteractive movedCube
