@@ -9,6 +9,18 @@ import Moves
         Si couleur du edge = couleur du centre alors GOOD sauf haut et bas
         Si couleur du edge = couleur du centre opposé alors GOOD sauf haut et bas
         Sinon = BAD
+
+    Look at the F/B faces. If you see:
+    
+       - L/R colour (orange/red) it's bad.
+       - U/D colour means you need to look round the side of the edge. If the side is F/B (white/yellow) it is bad.
+    
+    
+    Then look at the U/D faces of the M-slice (middle layer). The same rules apply. If you see:
+    
+       - L/R colour (orange/red) it's bad.
+       - U/D colour (green/blue) means you need to look round the side of the edge. If the side is F/B (white/yellow) it is bad.
+    
         U, U', D, D'
     groupe 2 : corner bien orientés + raie du milieu bien faite
         (edge haut face + edge bas face + edge haut arrière + edge bas arrière bien placés)
@@ -56,22 +68,43 @@ colorVerification modBy equalTo face =
 isFinished :: Cube -> Bool
 isFinished cube = cube == newCube
 
-group1Verification :: Cube -> Bool
-group1Verification [] = True
-group1Verification (x:xs)
-    | center == 'O' || center == 'R' = group1Verification xs
-    | edgeU /= center && edgeU /= opposite = False
-    | edgeR /= center && edgeR /= opposite = False
-    | edgeD /= center && edgeD /= opposite = False
-    | edgeL /= center && edgeL /= opposite = False
-    | otherwise = group1Verification xs
+edgeSide = [[(2, 7), (1, 5), (3, 3), (4, 1)], [(2, 3), (5, 3), (0, 3), (4, 3)], [(5, 7), (1, 1), (3, 1), (0, 1)], [(2, 5), (0, 5), (5, 5), (4, 5)], [(0, 7), (1, 7), (3, 7), (5, 1)], [(4, 7), (1, 3), (3, 5), (2, 1)]] -- edgeSide !! side !! edge
+
+getEdges :: Face -> String
+getEdges face = [face !! 1, face !! 3, face !! 5, face !! 7]
+
+getEdgeSide :: Cube -> Int -> [Int] -> String
+getEdgeSide _ _ [] = []
+getEdgeSide cube side (x:xs) = cube !! newSide !! newIndex : getEdgeSide cube side xs
     where
-        center = x !! 4
-        edgeU = x !! 1
-        edgeL = x !! 3
-        edgeR = x !! 5
-        edgeD = x !! 7
-        opposite = oppose center
+        (newSide, newIndex) = (edgeSide !! side !! x)
+
+group1Verification :: Cube -> Bool
+group1Verification cube
+    | any (\ z -> z == 'B' || z == 'G') (getEdges faceF) = False
+    | any (\ z -> z == 'B' || z == 'G') (getEdges faceB) = False
+    where
+        faceF = cube !! frontFace
+        faceB = cube !! backFace
+group1Verification cube
+    | any (\ z -> z == 'W' || z == 'Y') $ getEdgeSide cube frontFace (map (\(_,z) -> z) $ filter (\(x,_) -> x == 'O' || x == 'R') $ zip (getEdges faceF) [0..]) = False
+    | any (\ z -> z == 'W' || z == 'Y') $ getEdgeSide cube backFace (map (\(_,z) -> z) $ filter (\(x,_) -> x == 'O' || x == 'R') $ zip (getEdges faceB) [0..]) = False
+    where
+        faceF = cube !! frontFace
+        faceB = cube !! backFace
+group1Verification cube
+    | any (\ z -> z == 'B' || z == 'G') $ tail $ init (getEdges faceU) = False
+    | any (\ z -> z == 'B' || z == 'G') $ tail $ init (getEdges faceD) = False
+    where
+        faceD = cube !! downFace
+        faceU = cube !! upFace
+group1Verification cube
+    | any (\ z -> z == 'W' || z == 'Y') $ getEdgeSide cube upFace (map (\(_,z) -> z) $ filter (\(x,_) -> x == 'O' || x == 'R') $ init $ tail $ zip (getEdges faceU) [0..]) = False
+    | any (\ z -> z == 'W' || z == 'Y') $ getEdgeSide cube downFace (map (\(_,z) -> z) $ filter (\(x,_) -> x == 'O' || x == 'R') $ init $ tail $ zip (getEdges faceD) [0..]) = False
+    where
+        faceD = cube !! downFace
+        faceU = cube !! upFace
+group1Verification _ = True
 
 group2Verification :: Cube -> Bool
 group2Verification cube
@@ -118,15 +151,19 @@ orbitVerificationLoop' ((co1, co2, co3), (ce1, ce2, ce3)) =
 
 testAll = do
     putStrLn "Test isFinished"
-    putStrLn $ "True  -> " ++ (show $ isFinished newCube)
-    putStrLn $ "False -> " ++ (show $ isFinished $ moveR newCube)
-    putStrLn $ "True  -> " ++ (show $ isFinished $ moveR $ moveR' $ moveU2 $ moveU2 newCube)
+    putStrLn $ "newCube      True  -> " ++ (show $ isFinished newCube)
+    putStrLn $ "moveR        False -> " ++ (show $ isFinished $ moveR newCube)
+    putStrLn $ "U2U2R'R      True  -> " ++ (show $ isFinished $ moveR $ moveR' $ moveU2 $ moveU2 newCube)
     putStrLn "Test group1Verification"
-    putStrLn $ "True  -> " ++ (show $ group1Verification newCube)
+    putStrLn $ "newCube      True  -> " ++ (show $ group1Verification newCube)
+    putStrLn $ "LF           True  -> " ++ (show $ group1Verification $ moveF $ moveL newCube)
+    putStrLn $ "L            True  -> " ++ (show $ group1Verification $ moveL newCube)
     let cubeTest = moveR $ moveU2 $ moveD $ moveL' $ moveF' $ moveL $ moveF $ moveU $ moveL $ moveU newCube 
-    putStrLn $ "False -> " ++ (show $ group1Verification cubeTest)
-    putStrLn $ "False -> " ++ (show $ group1Verification $ moveU newCube)
-    putStrLn $ "True  -> " ++ (show $ group1Verification $ moveD2 newCube)
+    putStrLn $ "ULUFLF'L'DU2 False -> " ++ (show $ group1Verification cubeTest)
+    putStrLn $ "U            False -> " ++ (show $ group1Verification $ moveU newCube)
+    putStrLn $ "D2           True  -> " ++ (show $ group1Verification $ moveD2 newCube)
     putStrLn "Test group2Verification"
+    putStrLn $ "newCube      True  -> " ++ (show $ isFinished newCube)
+    putStrLn $ "newCube      True  -> " ++ (show $ isFinished newCube)
     -- putCubeColor cubeTest
    {-- ULUFLF'L'DU2R--}
