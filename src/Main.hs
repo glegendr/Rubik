@@ -7,6 +7,7 @@ import System.Exit
 import System.Console.ANSI
 import Control.Concurrent
 import Cube
+import Verification
 import Algo
 
 
@@ -18,8 +19,9 @@ main = do
         LexError str -> alert str
         otherwise -> return ()
     let shuffle = getShuffle lexed
-    putStrLn $ show $ map toMove shuffle
-    testAll
+    let shuffeledCube = foldl (\ cube f -> f cube) newCube $ map moveToAction $ map toMove shuffle
+    putCubeColor shuffeledCube
+    putStrLn $ show $ algo shuffeledCube
     --putInteractive newCube
     {-- putAnimatedCube False newCube [moveR, moveU, moveR', moveU'] --}
     {--rtxOnCube newCube--}

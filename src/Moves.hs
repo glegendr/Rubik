@@ -4,13 +4,13 @@ module Moves
     , toMove
     ) where
 
-data Option = ODirection | OStrokes | ONothing
+data Option = ODirection | OStrokes | ONothing deriving (Eq)
 instance Show Option where
     show ODirection = "Direction"
     show OStrokes = "Strokes"
     show ONothing = "Nothing"
     
-data Move =  MFront !Option | MRight !Option | MUp !Option | MBack !Option | MLeft !Option | MDown !Option
+data Move =  MFront !Option | MRight !Option | MUp !Option | MBack !Option | MLeft !Option | MDown !Option deriving (Eq)
 instance Show Move where
     show (MFront o) = "Front "  ++ show o 
     show (MRight o) = "Right " ++ show o
