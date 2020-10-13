@@ -149,8 +149,7 @@ orbitVerificationLoop (x:xs)
 orbitVerificationLoop' :: ((Char, Char, Char), (Char, Char, Char)) -> Bool
 orbitVerificationLoop' (a, b)
     | a == b = True
-orbitVerificationLoop' ((co1, co2, co3), (ce1, ce2, ce3)) =
-    all (\ (co, ce) -> co == oppose ce || co == ce) newList
+orbitVerificationLoop' ((co1, co2, co3), (ce1, ce2, ce3)) = all (\ (co, ce) -> co == oppose ce || co == ce) newList
     where
         newList = [(co1, ce1), (co2, ce2), (co3, ce3)]
 
