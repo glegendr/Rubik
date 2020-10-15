@@ -7,6 +7,7 @@ module Verification
 
 import Cube
 import Moves
+import Data.Bits
 
 {--
     groupe 0 : cube mélanger
@@ -51,61 +52,61 @@ G  G  G | 6  7  8 | B  B  B
         | Y  Y  Y |
 --}
 
-oppose :: Char -> Char
-oppose 'W' = 'Y'
-oppose 'G' = 'B'
-oppose 'O' = 'R'
-oppose 'B' = 'G'
-oppose 'R' = 'O'
-oppose 'Y' = 'W'
+oppose :: Int -> Int
+oppose 0 = 5
+oppose 1 = 3
+oppose 2 = 4
+oppose 3 = 1
+oppose 4 = 2
+oppose 5 = 0
 
-colorVerificationLoop :: Int -> Int -> [Face] -> Bool
-colorVerificationLoop _ _ [] = True
-colorVerificationLoop modBy equalTo  (x:xs)
-    | colorVerification modBy equalTo x == False = False
-    | otherwise = colorVerificationLoop modBy equalTo xs
+colorVerificationLoop :: [Int] -> [Face] -> [Int] -> Bool
+colorVerificationLoop _ [] _ = True
+colorVerificationLoop lst  (x:xs) (y:ys)
+    | colorVerification lst x y == False = False
+    | otherwise = colorVerificationLoop lst xs ys
 
 
-colorVerification :: Int -> Int -> Face -> Bool
-colorVerification modBy equalTo face =
-    all (== (face !! 4)) $ map (\(a, _) -> a) $ filter (\ (_, b) -> mod b modBy == equalTo) $ zip face [0..]
+colorVerification :: [Int] -> Face -> Int -> Bool
+colorVerification lst face color =
+    all (== color) $ map (\(a, _) -> a) $ filter (\ (_, b) -> b `elem` lst) $ zip (faceToList face) [0..]
 
 isFinished :: Cube -> Bool
 isFinished cube = cube == newCube
 
-edgeSide = [[(2, 7), (1, 5), (3, 3), (4, 1)], [(2, 3), (5, 3), (0, 3), (4, 3)], [(5, 7), (1, 1), (3, 1), (0, 1)], [(2, 5), (0, 5), (5, 5), (4, 5)], [(0, 7), (1, 7), (3, 7), (5, 1)], [(4, 7), (1, 3), (3, 5), (2, 1)]] -- edgeSide !! side !! edge
+edgeSide = [[(2, 6), (1, 4), (3, 3), (4, 1)], [(2, 3), (5, 3), (0, 3), (4, 3)], [(5, 6), (1, 1), (3, 1), (0, 1)], [(2, 4), (0, 4), (5, 4), (4, 4)], [(0, 6), (1, 6), (3, 6), (5, 1)], [(4, 6), (1, 3), (3, 4), (2, 1)]] -- edgeSide !! side !! edge
 
-getEdges :: Face -> String
-getEdges face = [face !! 1, face !! 3, face !! 5, face !! 7]
+getEdges :: Face -> [Int]
+getEdges face = [get face 1, get face 3, get face 4, get face 6]
 
-getEdgeSide :: Cube -> Int -> [Int] -> String
+getEdgeSide :: Cube -> Int -> [Int] -> [Int]
 getEdgeSide _ _ [] = []
-getEdgeSide cube side (x:xs) = cube !! newSide !! newIndex : getEdgeSide cube side xs
+getEdgeSide cube side (x:xs) = get (cube !! newSide) newIndex : getEdgeSide cube side xs
     where
         (newSide, newIndex) = (edgeSide !! side !! x)
 
 group1Verification :: Cube -> Bool
 group1Verification cube
-    | any (\ z -> z == 'B' || z == 'G') (getEdges faceF) = False
-    | any (\ z -> z == 'B' || z == 'G') (getEdges faceB) = False
+    | any (\ z -> z == 1 || z == 3) (getEdges faceF) = False
+    | any (\ z -> z == 1 || z == 3) (getEdges faceB) = False
     where
         faceF = cube !! frontFace
         faceB = cube !! backFace
 group1Verification cube
-    | any (\ z -> z == 'W' || z == 'Y') $ getEdgeSide cube frontFace (map (\(_,z) -> z) $ filter (\(x,_) -> x == 'O' || x == 'R') $ zip (getEdges faceF) [0..]) = False
-    | any (\ z -> z == 'W' || z == 'Y') $ getEdgeSide cube backFace (map (\(_,z) -> z) $ filter (\(x,_) -> x == 'O' || x == 'R') $ zip (getEdges faceB) [0..]) = False
+    | any (\ z -> z == 0 || z == 5) $ getEdgeSide cube frontFace (map (\(_,z) -> z) $ filter (\(x,_) -> x == 2 || x == 4) $ zip (getEdges faceF) [0..]) = False
+    | any (\ z -> z == 0 || z == 5) $ getEdgeSide cube backFace (map (\(_,z) -> z) $ filter (\(x,_) -> x == 2 || x == 4) $ zip (getEdges faceB) [0..]) = False
     where
         faceF = cube !! frontFace
         faceB = cube !! backFace
 group1Verification cube
-    | any (\ z -> z == 'B' || z == 'G') $ tail $ init (getEdges faceU) = False
-    | any (\ z -> z == 'B' || z == 'G') $ tail $ init (getEdges faceD) = False
+    | any (\ z -> z == 1 || z == 3) $ tail $ init (getEdges faceU) = False
+    | any (\ z -> z == 1 || z == 3) $ tail $ init (getEdges faceD) = False
     where
         faceD = cube !! downFace
         faceU = cube !! upFace
 group1Verification cube
-    | any (\ z -> z == 'W' || z == 'Y') $ getEdgeSide cube upFace (map (\(_,z) -> z) $ filter (\(x,_) -> x == 'O' || x == 'R') $ init $ tail $ zip (getEdges faceU) [0..]) = False
-    | any (\ z -> z == 'W' || z == 'Y') $ getEdgeSide cube downFace (map (\(_,z) -> z) $ filter (\(x,_) -> x == 'O' || x == 'R') $ init $ tail $ zip (getEdges faceD) [0..]) = False
+    | any (\ z -> z == 0 || z == 5) $ getEdgeSide cube upFace (map (\(_,z) -> z) $ filter (\(x,_) -> x == 2 || x == 4) $ init $ tail $ zip (getEdges faceU) [0..]) = False
+    | any (\ z -> z == 0 || z == 5) $ getEdgeSide cube downFace (map (\(_,z) -> z) $ filter (\(x,_) -> x == 2 || x == 4) $ init $ tail $ zip (getEdges faceD) [0..]) = False
     where
         faceD = cube !! downFace
         faceU = cube !! upFace
@@ -113,8 +114,8 @@ group1Verification _ = True
 
 group2Verification :: Cube -> Bool
 group2Verification cube
-    | colorVerificationLoop 2 0 [faceU, faceD] == False = False
-    | colorVerificationLoop 3 1 [faceU, faceD, faceF, faceB] == False = False
+    | colorVerificationLoop [0, 2, 5, 7] [faceU, faceD] [upFace, downFace] == False = False
+    | colorVerificationLoop [1, 6] [faceU, faceD, faceF, faceB] [upFace, downFace, frontFace, backFace] == False = False
     | otherwise = True
     where
         faceU = cube !! upFace
@@ -124,29 +125,29 @@ group2Verification cube
 
 group3Verification :: Cube -> Bool
 group3Verification cube
-    | colorVerificationLoop 2 1 cube == False = False
+    | colorVerificationLoop [1, 3, 4, 6] cube [0,1,2,3,4,5] == False = False
     | orbitVerification cube == False = False
     | otherwise = True
 
 orbitVerification :: Cube -> Bool
 orbitVerification cube = orbitVerificationLoop [coF1, coF2, coF3, coF4, coL1, coL2, coR1, coR2]
     where
-        coF1 = ((cube !! frontFace !! 0, cube !! leftFace !! 2,  cube !! upFace !! 6),      (cube !! frontFace !! 4, cube !! leftFace !! 4,  cube !! upFace !! 4))
-        coF2 = ((cube !! frontFace !! 2, cube !! upFace !! 8,    cube !! rightFace !! 0),   (cube !! frontFace !! 4, cube !! upFace !! 4,    cube !! rightFace !! 4))
-        coF3 = ((cube !! frontFace !! 8, cube !! rightFace !! 6, cube !! downFace !! 2),    (cube !! frontFace !! 4, cube !! rightFace !! 4, cube !! downFace !! 4))
-        coF4 = ((cube !! frontFace !! 6, cube !! downFace !! 0,  cube !! leftFace !! 8),    (cube !! frontFace !! 4, cube !! downFace !! 4,  cube !! leftFace !! 4))
-        coL1 = ((cube !! leftFace !! 0,  cube !! backFace !! 6,  cube !! upFace !! 0),      (cube !! leftFace !! 4,  cube !! backFace !! 4,  cube !! upFace !! 4))
-        coL2 = ((cube !! leftFace !! 6,  cube !! downFace !! 6,  cube !! backFace !! 0),    (cube !! leftFace !! 4,  cube !! downFace !! 4,  cube !! backFace !! 4))
-        coR1 = ((cube !! rightFace !! 2, cube !! upFace !! 2,    cube !! backFace !! 8),    (cube !! rightFace !! 4, cube !! upFace !! 4,    cube !! backFace !! 4))
-        coR2 = ((cube !! rightFace !! 8, cube !! downFace !! 8,  cube !! backFace !! 2),    (cube !! rightFace !! 4, cube !! downFace !! 4,  cube !! backFace !! 4))
+        coF1 = ((get (cube !! frontFace) 0, get (cube !! leftFace) 2,  get (cube !! upFace) 6),      (get (cube !! frontFace) 4, get (cube !! leftFace) 4,  get (cube !! upFace) 4))
+        coF2 = ((get (cube !! frontFace) 2, get (cube !! upFace) 8,    get (cube !! rightFace) 0),   (get (cube !! frontFace) 4, get (cube !! upFace) 4,    get (cube !! rightFace) 4))
+        coF3 = ((get (cube !! frontFace) 8, get (cube !! rightFace) 6, get (cube !! downFace) 2),    (get (cube !! frontFace) 4, get (cube !! rightFace) 4, get (cube !! downFace) 4))
+        coF4 = ((get (cube !! frontFace) 6, get (cube !! downFace) 0,  get (cube !! leftFace) 8),    (get (cube !! frontFace) 4, get (cube !! downFace) 4,  get (cube !! leftFace) 4))
+        coL1 = ((get (cube !! leftFace) 0,  get (cube !! backFace) 6,  get (cube !! upFace) 0),      (get (cube !! leftFace) 4,  get (cube !! backFace) 4,  get (cube !! upFace) 4))
+        coL2 = ((get (cube !! leftFace) 6,  get (cube !! downFace) 6,  get (cube !! backFace) 0),    (get (cube !! leftFace) 4,  get (cube !! downFace) 4,  get (cube !! backFace) 4))
+        coR1 = ((get (cube !! rightFace) 2, get (cube !! upFace) 2,    get (cube !! backFace) 8),    (get (cube !! rightFace) 4, get (cube !! upFace) 4,    get (cube !! backFace) 4))
+        coR2 = ((get (cube !! rightFace) 8, get (cube !! downFace) 8,  get (cube !! backFace) 2),    (get (cube !! rightFace) 4, get (cube !! downFace) 4,  get (cube !! backFace) 4))
 
-orbitVerificationLoop :: [((Char, Char, Char), (Char, Char, Char))] -> Bool
+orbitVerificationLoop :: [((Int, Int, Int), (Int, Int, Int))] -> Bool
 orbitVerificationLoop [] = True
 orbitVerificationLoop (x:xs)
     | orbitVerificationLoop' x == False = False
     | otherwise = orbitVerificationLoop xs
 
-orbitVerificationLoop' :: ((Char, Char, Char), (Char, Char, Char)) -> Bool
+orbitVerificationLoop' :: ((Int, Int, Int), (Int, Int, Int)) -> Bool
 orbitVerificationLoop' (a, b)
     | a == b = True
 orbitVerificationLoop' ((co1, co2, co3), (ce1, ce2, ce3)) = all (\ (co, ce) -> co == oppose ce || co == ce) newList
@@ -168,6 +169,6 @@ testAll = do
     putStrLn $ "D2           True  -> " ++ (show $ group1Verification $ moveD2 newCube)
     putStrLn "Test group2Verification"
     putStrLn $ "newCube      True  -> " ++ (show $ isFinished newCube)
-    putStrLn $ "newCube      True  -> " ++ (show $ isFinished newCube)
+    -- putStrLn $ "newCube      True  -> " ++ (show $ isFinished newCube)
     -- putCubeColor cubeTest
    {-- ULUFLF'L'DU2R--}
