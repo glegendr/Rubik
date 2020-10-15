@@ -287,10 +287,9 @@ moveToAction (MDown OStrokes) = moveD2
 moveToAction (MDown ODirection) = moveD'
 
 allTrueMoves = [MFront ONothing, MFront ODirection, MFront OStrokes, MRight ONothing, MRight ODirection, MRight OStrokes, MUp ONothing, MUp ODirection, MUp OStrokes, MBack ONothing, MBack ODirection, MBack OStrokes, MLeft ONothing, MLeft ODirection, MLeft OStrokes, MDown ONothing, MDown ODirection, MDown OStrokes]
-allTrueMovesKey key = allTrueMovesKey' key allTrueMoves
 
-allTrueMovesKey' key lst
-    | key == 0 = lst
-    | key == 1 = allTrueMovesKey' (key - 1) $ delete (MUp ONothing) $ delete (MUp ODirection) $ delete (MDown ONothing) $ delete (MDown ODirection) lst
-    | key == 2 = allTrueMovesKey' (key - 1) $ delete (MFront ONothing) $ delete (MFront ODirection) $ delete (MBack ONothing) $ delete (MBack ODirection) lst
-    | key == 3 = allTrueMovesKey' (key - 1) $ delete (MRight ONothing) $ delete (MRight ODirection) $ delete (MLeft ONothing) $ delete (MLeft ODirection) lst
+allTrueMovesKey key
+    | key == 0 = allTrueMoves
+    | key == 1 = [MFront ONothing, MFront ODirection, MFront OStrokes, MRight ONothing, MRight ODirection, MRight OStrokes, MUp OStrokes, MBack ONothing, MBack ODirection, MBack OStrokes, MLeft ONothing, MLeft ODirection, MLeft OStrokes, MDown OStrokes]
+    | key == 2 = [MFront OStrokes, MRight ONothing, MRight ODirection, MRight OStrokes, MUp OStrokes, MBack OStrokes, MLeft ONothing, MLeft ODirection, MLeft OStrokes, MDown OStrokes]
+    | key == 3 = [MFront OStrokes, MRight OStrokes, MUp OStrokes, MBack OStrokes, MLeft OStrokes, MDown OStrokes]
