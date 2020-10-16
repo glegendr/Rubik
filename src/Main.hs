@@ -21,7 +21,10 @@ main = do
     let shuffle = getShuffle lexed
     let shuffeledCube = foldl (\ cube f -> f cube) newCube $ map moveToAction $ map toMove shuffle
     putCubeColor shuffeledCube
-    putStrLn $ show $ algo shuffeledCube
+    let ret = algo shuffeledCube
+    putStrLn $ show $ length ret
+    putMoves ret
+    -- putAnimatedCube False shuffeledCube (map moveToAction ret)
     --putInteractive newCube
     {-- putAnimatedCube False newCube [moveR, moveU, moveR', moveU'] --}
     {--rtxOnCube newCube--}
@@ -48,7 +51,7 @@ putAnimatedCube True cube [] = rtxOnCube cube
 putAnimatedCube False cube (x:xs) = do
     putCubeColor cube
     cursorUpLine 15
-    threadDelay 500000
+    threadDelay 250000
     putAnimatedCube False (x cube) xs
 putAnimatedCube True cube (x:xs) = do
     rtxOnCube cube

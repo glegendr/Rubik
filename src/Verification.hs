@@ -68,7 +68,7 @@ colorVerificationLoop modBy equalTo  (x:xs)
 
 colorVerification :: Int -> Int -> Face -> Bool
 colorVerification modBy equalTo face =
-    all (== (face !! 4)) $ map (\(a, _) -> a) $ filter (\ (_, b) -> mod b modBy == equalTo) $ zip face [0..]
+    all (\ (a, _) -> a == (face !! 4)) $ filter (\ (_, b) -> mod b modBy == equalTo) $ zip face [0..]
 
 isFinished :: Cube -> Bool
 isFinished cube = cube == newCube

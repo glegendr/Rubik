@@ -293,3 +293,4 @@ allTrueMovesKey key
     | key == 1 = [MFront ONothing, MFront ODirection, MFront OStrokes, MRight ONothing, MRight ODirection, MRight OStrokes, MUp OStrokes, MBack ONothing, MBack ODirection, MBack OStrokes, MLeft ONothing, MLeft ODirection, MLeft OStrokes, MDown OStrokes]
     | key == 2 = [MFront OStrokes, MRight ONothing, MRight ODirection, MRight OStrokes, MUp OStrokes, MBack OStrokes, MLeft ONothing, MLeft ODirection, MLeft OStrokes, MDown OStrokes]
     | key == 3 = [MFront OStrokes, MRight OStrokes, MUp OStrokes, MBack OStrokes, MLeft OStrokes, MDown OStrokes]
+    | key == 4 = []
