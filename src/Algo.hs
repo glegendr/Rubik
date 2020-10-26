@@ -6,6 +6,7 @@ import Verification
 import Debug.Trace
 
 -- 
+-- Thistlethwaite's algorithm
 -- 
 -- algo :: Cube -> [Move]
 -- algo cube = algo' openList closeList
@@ -23,23 +24,42 @@ import Debug.Trace
 --
 
 algo = iDDFS 0 [] 0
+-- algo = bIDDFS 0 [] [] 0 newCube
 -- algo = initBfs [] (-1)
 
 iDDFS :: Int -> [Move] -> Int -> Cube -> [Move]
 iDDFS depth oldMoves key root
-    | makeMoves moves root == newCube = oldMoves ++ moves
+    | key == 4 && makeMoves moves root == newCube = oldMoves ++ moves
     | moves /= [] = trace (show $ length moves) $ iDDFS 0 (oldMoves ++ moves) newKey (makeMoves moves root)
     | otherwise = iDDFS (depth + 1) oldMoves newKey root
     where (moves, newKey) = trace ((show depth) ++ " -> " ++ (show key)) $ dLS root depth [] key (allTrueMovesKey key)
 
+bIDDFS :: Int -> [Move] -> [Move] -> Int -> Cube -> Cube -> [Move]
+bIDDFS depth oldMoves oldMovesBack key cubeBack root
+    | makeMoves movesBack cubeBack == makeMoves moves root = oldMoves ++ moves ++ reverse (oldMovesBack ++ movesBack)
+    | makeMoves moves root == newCube = oldMoves ++ moves
+    | moves /= [] = trace (show $ length moves) $ bIDDFS 0 (oldMoves ++ moves) (oldMovesBack ++ movesBack) newKey (makeMoves moves cubeBack) (makeMoves moves root)
+    | otherwise = bIDDFS (depth + 1) oldMoves oldMovesBack newKey cubeBack root
+    where (moves, newKey, movesBack) = trace ((show depth) ++ " -> " ++ (show key)) $ bDLS root cubeBack depth [] [] key (allTrueMovesKey key) False
+
 dLS :: Cube -> Int -> [Move] -> Int -> [Move] -> ([Move], Int)
 dLS node depth moves key moveKey
     | depth /= 0 = applyDLS moveKey node (depth - 1) moves key moveKey
-    | key == 0 && group1Verification node = trace "ETAPE 1" $ (moves, 1)
-    | key == 1 && group2Verification node = trace "ETAPE 2" $ (moves, 2)
-    | key == 2 && group3Verification node = trace "ETAPE 3" $ (moves, 3)
+    | key == 0 && group1Verification node = trace ("ETAPE 1 --> " ++ show node) $ (moves, 1)
+    | key == 1 && group2Verification node = trace ("ETAPE 2 --> " ++ show node) $ (moves, 2)
+    | key == 2 && group3Verification node = trace ("ETAPE 3 --> " ++ show node) $ (moves, 3)
     | key == 3 && node == newCube = (moves, 4)
     | otherwise = ([], key)
+
+bDLS :: Cube -> Cube -> Int -> [Move] -> [Move] -> Int -> [Move] -> Bool -> ([Move], Int, [Move])
+bDLS node nodeBack depth moves movesBack key moveKey back
+    | depth /= 0 = applyBDLS moveKey node nodeBack (depth - 1) moves movesBack key moveKey False
+    | back == False && key == 0 && group1Verification node = trace "ETAPE 1" $ (moves, 1, movesBack)
+    | back == False && key == 1 && group2Verification node = trace "ETAPE 2" $ (moves, 2, movesBack)
+    | back == False && key == 2 && group3Verification node = trace "ETAPE 3" $ (moves, 3, movesBack)
+    | back == False && key == 3 && node == newCube = (moves, 4, movesBack)
+    | nodeBack == node = (moves, key + 1, movesBack)
+    | otherwise = ([], key, [])
 
 applyDLS :: [Move] -> Cube -> Int -> [Move] -> Int -> [Move] -> ([Move], Int)
 applyDLS [] _ _ _ key _ = ([], key)
@@ -49,8 +69,18 @@ applyDLS (x:xs) cube depth moves key moveKey
     | otherwise = (dlsReturn, newKey)
     where (dlsReturn, newKey) = dLS (moveToAction x cube) depth (moves ++ [x]) key moveKey
 
-makeMoves :: [Move] -> Cube -> Cube
-makeMoves moves cube = foldl (\ newCube f -> f newCube) cube $ map moveToAction moves
+applyBDLS :: [Move] -> Cube -> Cube -> Int -> [Move] -> [Move] -> Int -> [Move] -> Bool -> ([Move], Int, [Move])
+applyBDLS [] _ _ _  _ _ key _ _ = ([], key, [])
+applyBDLS lst@(x:xs) cube cubeBack depth moves movesBack key moveKey back
+    | back == False && skipMove x moves = applyBDLS lst cube cubeBack depth moves movesBack key moveKey True
+    | back == True && skipMove x moves = applyBDLS xs cube cubeBack depth moves movesBack key moveKey False
+    | back == False && bDlsReturn == [] = applyBDLS xs cube cubeBack depth moves movesBack key moveKey True
+    | back == True && bDlsReturnBack == [] = applyBDLS xs cube cubeBack depth moves movesBack key moveKey False
+    | back == False = (bDlsReturn, newKey, newMovesBack1)
+    | otherwise = (bDlsReturnBack, newKeyBack, newMovesBack2)
+    where
+        (bDlsReturn, newKey, newMovesBack1) = bDLS (moveToAction x cube) cubeBack depth (moves ++ [x]) movesBack key moveKey False
+        (bDlsReturnBack, newKeyBack, newMovesBack2) = bDLS cube (moveToAction x cubeBack) depth moves (movesBack ++ [x]) key moveKey True
 
 skipMove x lst = skipMove' (clear x) (map clear lst)
 

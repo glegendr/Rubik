@@ -1,6 +1,7 @@
 module Cube
 ( Cube
 , Face
+, makeMoves
 , allTrueMoves
 , allTrueMovesKey
 , rtxOnCube
@@ -33,6 +34,7 @@ module Cube
 , downFace
 , backFace
 , moveToAction
+, getCube
 ) where
 
 import Moves
@@ -294,3 +296,10 @@ allTrueMovesKey key
     | key == 2 = [MFront OStrokes, MRight ONothing, MRight ODirection, MRight OStrokes, MUp OStrokes, MBack OStrokes, MLeft ONothing, MLeft ODirection, MLeft OStrokes, MDown OStrokes]
     | key == 3 = [MFront OStrokes, MRight OStrokes, MUp OStrokes, MBack OStrokes, MLeft OStrokes, MDown OStrokes]
     | key == 4 = []
+
+
+makeMoves :: [Move] -> Cube -> Cube
+makeMoves moves cube = foldl (\ newCube f -> f newCube) cube $ map moveToAction moves
+
+getCube :: Int -> Cube
+getCube 0 = []
