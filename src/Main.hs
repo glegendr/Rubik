@@ -26,7 +26,13 @@ main = do
     -- putMoves ret
     ---------------
     -- putAnimatedCube False shuffeledCube (map moveToAction ret)
-    putInteractive newCube
+    putStrLn $ show $ makeMoves (take 400000 (repeat (MRight ONothing))) newCube
+    -- 400000 U - (3.502 + 3.596 + 3.587 + 3.584 + 3.622) / 5 = 3,5782 
+    -- 400000 F - (9.117 + 9.017 + 8.968 + 8.929 + 9.023) / 5 = 9,0108 
+    -- 400000 R - (11.191 + 10.002 + 10.030 + 9.075 + 9.986) / 5 = 10,0568
+
+
+    -- putInteractive newCube
     {-- putAnimatedCube False newCube [moveR, moveU, moveR', moveU'] --}
     {--rtxOnCube newCube--}
     {--putCubeColor $ moveR newCube

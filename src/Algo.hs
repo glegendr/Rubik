@@ -49,9 +49,6 @@ applyDLS (x:xs) cube depth moves key moveKey
     | otherwise = (dlsReturn, newKey)
     where (dlsReturn, newKey) = dLS (moveToAction x cube) depth (moves ++ [x]) key moveKey
 
-makeMoves :: [Move] -> Cube -> Cube
-makeMoves moves cube = foldl (\ newCube f -> f newCube) cube $ map moveToAction moves
-
 skipMove x lst = skipMove' (clear x) (map clear lst)
 
 skipMove' :: Move -> [Move] -> Bool
