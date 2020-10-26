@@ -13,19 +13,20 @@ import Algo
 
 main :: IO ()
 main = do
-    args <- getArgs
-    let lexed = lexMe args
-    case head lexed of
-        LexError str -> alert str
-        otherwise -> return ()
-    let shuffle = getShuffle lexed
-    let shuffeledCube = foldl (\ cube f -> f cube) newCube $ map moveToAction $ map toMove shuffle
-    putCubeColor shuffeledCube
-    let ret = algo shuffeledCube
-    putStrLn $ show $ length ret
-    putMoves ret
+    -- args <- getArgs
+    -- let lexed = lexMe args
+    -- case head lexed of
+    --     LexError str -> alert str
+    --     otherwise -> return ()
+    -- let shuffle = getShuffle lexed
+    -- let shuffeledCube = foldl (\ cube f -> f cube) newCube $ map moveToAction $ map toMove shuffle
+    -- putCubeColor shuffeledCube
+    -- let ret = algo shuffeledCube
+    -- putStrLn $ show $ length ret
+    -- putMoves ret
+    ---------------
     -- putAnimatedCube False shuffeledCube (map moveToAction ret)
-    --putInteractive newCube
+    putInteractive newCube
     {-- putAnimatedCube False newCube [moveR, moveU, moveR', moveU'] --}
     {--rtxOnCube newCube--}
     {--putCubeColor $ moveR newCube
@@ -71,6 +72,14 @@ putInteractive cube = do
     let shuffle = getShuffle lexed
     let myMove = head $ map toMove shuffle
     let movedCube = (moveToAction myMove) cube
-    cursorUpLine 16
+    cursorUpLine 17
     putCubeColor movedCube
+    putStrLn $ show $ countAll movedCube
     putInteractive movedCube
+
+
+countAll :: Cube -> Bool
+countAll cube = all (== 9) $ countAll' $ foldl1 (++) cube
+
+countAll' :: [Char] -> [Int]
+countAll' lst = (length $ filter (== 'W') lst):(length $ filter (== 'G') lst):(length $ filter (== 'R') lst):(length $ filter (== 'Y') lst):(length $ filter (== 'B') lst):(length $ filter (== 'O') lst):[]

@@ -29,7 +29,7 @@ iDDFS :: Int -> [Move] -> Int -> Cube -> [Move]
 iDDFS depth oldMoves key root
     | makeMoves moves root == newCube = oldMoves ++ moves
     | moves /= [] = trace (show $ length moves) $ iDDFS 0 (oldMoves ++ moves) newKey (makeMoves moves root)
-    | otherwise = iDDFS (depth + 1) oldMoves newKey root
+    | otherwise = iDDFS (depth + 1) oldMoves key root
     where (moves, newKey) = trace ((show depth) ++ " -> " ++ (show key)) $ dLS root depth [] key (allTrueMovesKey key)
 
 dLS :: Cube -> Int -> [Move] -> Int -> [Move] -> ([Move], Int)
