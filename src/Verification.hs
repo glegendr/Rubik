@@ -86,39 +86,49 @@ getEdgeSide cube side (x:xs) = cube !! newSide !! newIndex : getEdgeSide cube si
 
 group1Verification :: Cube -> Bool
 group1Verification cube
-    | any (\ z -> z == 'B' || z == 'G') (getEdges faceF) = False
-    | any (\ z -> z == 'B' || z == 'G') (getEdges faceB) = False
+    | any (\ z -> z == 'O' || z == 'R') (getEdges faceF) = False -- B G == O R
+    | any (\ z -> z == 'O' || z == 'R') (getEdges faceB) = False
     where
         faceF = cube !! frontFace
         faceB = cube !! backFace
 group1Verification cube
-    | any (\ z -> z == 'W' || z == 'Y') $ getEdgeSide cube frontFace (map (\(_,z) -> z) $ filter (\(x,_) -> x == 'O' || x == 'R') $ zip (getEdges faceF) [0..]) = False
-    | any (\ z -> z == 'W' || z == 'Y') $ getEdgeSide cube backFace (map (\(_,z) -> z) $ filter (\(x,_) -> x == 'O' || x == 'R') $ zip (getEdges faceB) [0..]) = False
+    | any (\ z -> z == 'W' || z == 'Y') $ getEdgeSide cube frontFace (map (\(_,z) -> z) $ filter (\(x,_) -> x == 'B' || x == 'G') $ zip (getEdges faceF) [0..]) = False
+    | any (\ z -> z == 'W' || z == 'Y') $ getEdgeSide cube backFace (map (\(_,z) -> z) $ filter (\(x,_) -> x == 'B' || x == 'G') $ zip (getEdges faceB) [0..]) = False
     where
         faceF = cube !! frontFace
         faceB = cube !! backFace
 group1Verification cube
-    | any (\ z -> z == 'B' || z == 'G') $ tail $ init (getEdges faceU) = False
-    | any (\ z -> z == 'B' || z == 'G') $ tail $ init (getEdges faceD) = False
+    | any (\ z -> z == 'O' || z == 'R') $ tail $ init (getEdges faceL) = False
+    | any (\ z -> z == 'O' || z == 'R') $ tail $ init (getEdges faceR) = False
     where
-        faceD = cube !! downFace
-        faceU = cube !! upFace
+        faceR = cube !! rightFace
+        faceL = cube !! leftFace
 group1Verification cube
-    | any (\ z -> z == 'W' || z == 'Y') $ getEdgeSide cube upFace (map (\(_,z) -> z) $ filter (\(x,_) -> x == 'O' || x == 'R') $ init $ tail $ zip (getEdges faceU) [0..]) = False
-    | any (\ z -> z == 'W' || z == 'Y') $ getEdgeSide cube downFace (map (\(_,z) -> z) $ filter (\(x,_) -> x == 'O' || x == 'R') $ init $ tail $ zip (getEdges faceD) [0..]) = False
+    | any (\ z -> z == 'W' || z == 'Y') $ getEdgeSide cube upFace (map (\(_,z) -> z) $ filter (\(x,_) -> x == 'B' || x == 'G') $ init $ tail $ zip (getEdges faceL) [0..]) = False
+    | any (\ z -> z == 'W' || z == 'Y') $ getEdgeSide cube downFace (map (\(_,z) -> z) $ filter (\(x,_) -> x == 'B' || x == 'G') $ init $ tail $ zip (getEdges faceR) [0..]) = False
     where
-        faceD = cube !! downFace
-        faceU = cube !! upFace
+        faceR = cube !! rightFace
+        faceL = cube !! leftFace
 group1Verification _ = True
+
+checkMiddleLine :: [Face] -> Bool
+checkMiddleLine [] = True
+checkMiddleLine (x:xs)
+    | all (== color) mid == False = False
+    | otherwise = checkMiddleLine xs
+    where
+        mid = take 3 $ drop 3 x
+        color = head mid
 
 group2Verification :: Cube -> Bool
 group2Verification cube
-    | colorVerificationLoop 2 0 [faceU, faceD] == False = False
-    | colorVerificationLoop 3 1 [faceU, faceD, faceF, faceB] == False = False
+    | colorVerificationLoop 2 0 [faceR, faceL] == False = False
+    | checkMiddleLine [faceF, faceB, faceR, faceL] == False = False
+    -- | colorVerificationLoop 3 1 [faceU, faceD, faceF, faceB] == False = False
     | otherwise = True
     where
-        faceU = cube !! upFace
-        faceD = cube !! downFace
+        faceR = cube !! rightFace
+        faceL = cube !! leftFace
         faceF = cube !! frontFace
         faceB = cube !! backFace
 
@@ -160,12 +170,12 @@ testAll = do
     putStrLn $ "U2U2R'R      True  -> " ++ (show $ isFinished $ moveR $ moveR' $ moveU2 $ moveU2 newCube)
     putStrLn "Test group1Verification"
     putStrLn $ "newCube      True  -> " ++ (show $ group1Verification newCube)
-    putStrLn $ "LF           True  -> " ++ (show $ group1Verification $ moveF $ moveL newCube)
-    putStrLn $ "L            True  -> " ++ (show $ group1Verification $ moveL newCube)
+    putStrLn $ "LF           False  -> " ++ (show $ group1Verification $ moveF $ moveL newCube)
+    putStrLn $ "L            False  -> " ++ (show $ group1Verification $ moveL newCube)
     let cubeTest = moveR $ moveU2 $ moveD $ moveL' $ moveF' $ moveL $ moveF $ moveU $ moveL $ moveU newCube 
     putStrLn $ "ULUFLF'L'DU2 False -> " ++ (show $ group1Verification cubeTest)
-    putStrLn $ "U            False -> " ++ (show $ group1Verification $ moveU newCube)
-    putStrLn $ "D2           True  -> " ++ (show $ group1Verification $ moveD2 newCube)
+    putStrLn $ "L            False -> " ++ (show $ group1Verification $ moveL newCube)
+    putStrLn $ "R2           True  -> " ++ (show $ group1Verification $ moveR2 newCube)
     putStrLn "Test group2Verification"
     putStrLn $ "newCube      True  -> " ++ (show $ isFinished newCube)
     putStrLn $ "newCube      True  -> " ++ (show $ isFinished newCube)

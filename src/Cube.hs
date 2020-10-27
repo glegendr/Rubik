@@ -338,8 +338,8 @@ allTrueMoves = [MFront ONothing, MFront ODirection, MFront OStrokes, MRight ONot
 
 allTrueMovesKey key
     | key == 0 = allTrueMoves
-    | key == 1 = [MFront ONothing, MFront ODirection, MFront OStrokes, MRight ONothing, MRight ODirection, MRight OStrokes, MUp OStrokes, MBack ONothing, MBack ODirection, MBack OStrokes, MLeft ONothing, MLeft ODirection, MLeft OStrokes, MDown OStrokes]
-    | key == 2 = [MFront OStrokes, MRight ONothing, MRight ODirection, MRight OStrokes, MUp OStrokes, MBack OStrokes, MLeft ONothing, MLeft ODirection, MLeft OStrokes, MDown OStrokes]
+    | key == 1 = [MFront ONothing, MFront ODirection, MFront OStrokes, MRight OStrokes, MUp ONothing, MUp ODirection, MUp OStrokes, MBack ONothing, MBack ODirection, MBack OStrokes, MLeft OStrokes, MDown ONothing, MDown ODirection, MDown OStrokes]
+    | key == 2 = [MFront OStrokes, MRight OStrokes, MUp ONothing, MUp ODirection, MUp OStrokes, MBack OStrokes, MLeft OStrokes, MDown ONothing, MDown ODirection, MDown OStrokes]
     | key == 3 = [MFront OStrokes, MRight OStrokes, MUp OStrokes, MBack OStrokes, MLeft OStrokes, MDown OStrokes]
     | key == 4 = []
    
