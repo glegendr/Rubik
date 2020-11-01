@@ -1,37 +1,8 @@
 module Cube
 ( Cube
 , Face
-, allTrueMoves
-, allTrueMovesKey
-, rtxOnCube
 , newCube
-, cubeToString
-, putCube
 , putCubeColor
-, moveF
-, moveF2
-, moveF'
-, moveR
-, moveR2
-, moveR'
-, moveL
-, moveL2
-, moveL'
-, moveU
-, moveU2
-, moveU'
-, moveD
-, moveD2
-, moveD'
-, moveB
-, moveB2
-, moveB'
-, frontFace
-, leftFace
-, upFace
-, rightFace
-, downFace
-, backFace
 , moveToAction
 , makeMoves
 ) where
@@ -92,9 +63,6 @@ cubeToString (ff:lf:uf:rf:df:bf:[]) =
         cutBy3 (x:y:z:xs) = [[x], [y], [z]] : cutBy3 xs
 cubeToString _ = []
 
-putCube :: Cube -> IO ()
-putCube = putStr . cubeToString
-
 putCubeColor :: Cube -> IO ()
 putCubeColor = putCubeColor' . cubeToString
 
@@ -122,24 +90,6 @@ putCubeColor' (x:xs)
     | otherwise = do
         putChar x 
         putCubeColor' xs
-
-rtxOnCube :: Cube -> IO ()
-rtxOnCube = putCubeColor' . rtxOnCube' 0 rtxOn2 . foldl1 (++) . take 3 
-    where  
-        rtxOn = "\n              %JJJJJJJJJ%@\n      ,@%ZZZZZZZZZ#@&%KKKKKKKKK%*\n@@PPPPPPPP#%@@%NNNNNNNNN%@@&LLLLLLLLL%@\n11111@@@QQQQQQQQQ#%@@UUUUUUUUUUU&@@CCCC&\n11111@%222@@@@++++++++++++@@@@SSS@CCCCC@\n*1111@@22222@333@@@@&@@&AA@%SSSSS@CCCCC@\n@.@@&@@22222@333333@%AAAAA&&SSSSS@&@@@%#\n#44444@@@@@5@333333@%AAAAA@%S%@@@@XXXXX\n444444@55555@@@@666@&AA@@@@EEEEEE@XXXXX\n&@@444@55555@66666@@@DDDDD@EEEEEE@XXX@@,\n*7777*@@/888@666666@DDDDDD@EEEE%@%(IIII\n 77777@8888@@@66666@DDDDDD@@@HHH&@IIIII\n *7777@88888@99 @@@@@@@TTT@HHHHHH%@III&\n      (88888@99999@@TTTTTT@HHHHH@&\n           #@99999&@TTTTTT@&(\n               *&&&@TT@@\n"
-        rtxOn2 = "\n                                    ::JJ::\n                              ::JJJJJJJJJJJJJ::\n                         ::*VFVVVJJJJJJJJJJJVVVFFV:::\n                   :::ZZZZZZZVVFFMFFVV*VVFFMMFFVVKKKKKKKK:: \n            :::*VVVZZZZZZZZZZZZZZZVFMMMMMFVKKKKKKKKKKKKKKKKV**::::\n       ::PPPPPPVVFFFFVVVZZZZZVVFFFFFVVNNVVFFFFVVKKKKKKVVFFFFVVLLLLLLL::\n :PPPPPPPPPPPPPPPPPPVVFFFFFMMFFVVNNNNNNNNNNNNVVFFFFFFFFVVLLLLLLLLLLLLLLLLLL:\n:FMMMFVVVPPPPPPPVVVFFMMFFVVFFFFVVVNNNNNNNNNNVVFFMFFVFFMMMFVVVLLLLLLLLVVFMMMM*\n:V11VVMMMMFVVFFMMFFVVQQQQQQQQQVVFFFFFNNNNFMMFFVUUUUUUUUUVVFFMMFFVFFMMMMMFFCF*\n V1111111VF$M$MMVVQQQQQQQQQQQQQQVVVFMMFMMMVVUUUUUUUUUUUUUUUVVFM$$MMFFCCCCCCF*\n V111111111MMMFM$$MMFVVVQQQVVFFMMFFVV+VVVVFFFFFVVUUUUUVVFMM$$MMMMMCCCCCCCCCF*\n V111111111MMF2222VFM$$MMFMMMFVV++++++++++VVVVVFMMFFFM$$$MMFFSSFMMCCCCCCCCCF:\n 1111111111MMF222222222VMMMMMFVVV+++++++++VVVVFMM$$$MMFFSSSSSSSFMMCCCCCCCCCF:\n 1111111111FMM2222222222MMVVVMMMMMFVVVVVVFMMM$$MMFF$$FSSSSSSSSSFMMCCCCCCCCCF:\n 1111111111FMM2222222222MMV33333VFM$$MMM$$MMFFAAAAF$$FSSSSSSSSSMMMCCCCCCCCFF:\n :MMMFV1111FMM2222222222MM3333333333VMMMFFAAAAAAAAF$$FSSSSSSSSSMMMCCCCFFMMMV\n :44VVMMMMFF$M2222222222MM33333333333MMMFAAAAAAAAAF$$FSSSSSSSSSMMMFMM$$$MMFM\n :4444444VF$M$FV22222222M$33333333333MMMFAAAAAAAAAFM$FSSSSSSSSFMM$$MMFFXXXXF\n :V44444444VM$M$$MFV2222M$33333333333MMMFAAAAAAAAAF$$FSSSFFMM$$M$MXXXXXXXXXX\n  V44444444V$M55VFM$$MFFM$33333333333MMMFAAAAAAAAAF$$MMM$$MMFFFM$FXXXXXXXXXX\n  V44444444V$M5555555VFMMMMFV33333333MMMFAAAAAAFFMMM$$MMFFEEEEEM$FXXXXXXXXX*\n  V444444444$$5555555555$MM$M$MFVV333M$MFAAFFMM$MM$MMFEEEEEEEEEM$FXXXXXXXXX*\n  V444444444$$5555555555$M666VFM$M$MFM$MMMMMMMFFDF$MFEEEEEEEEEEM$FXXXXXXXXF*\n :M$MFV44444$$5555555555$$6666666VFM$M$MMFFDDDDDDF$$FEEEEEEEEEEM$XXXXXFFMM$I\n :V77VFM$MFF$$5555555555$$6666666666FMMFDDDDDDDDDFM$MEEEEEEEEEFMMFFMM$$MMFII\n  V777777VFM$$FV55555555$$6666666666FM$FDDDDDDDDDDM$MEEEEEEEEEF$$$$MMFIIIIII\n  V777777777$MM$$MVV5555$$6666666666VM$FDDDDDDDDDDM$MEEEEEFMM$M$MMIIIIIIIII*\n  V777777777$M888VFM$MFV$$V666666666V$$FDDDDDDDDDDM$MFFMM$MMFFF$$FIIIIIIIII*\n  V777777777$M8888888VFMMMMV66666666V$$FDDDDDDDDFFM$$MMFFHHHHHF$$FIIIIIIIII*\n  V777777777$$888888888V$MFM$MFV6666V$$FDDDFFMMMMMMMFHHHHHHHHHF$$FIIIIIIIIF*\n  :777777777$$8888888888$M999VF$$MFVF$$FFMMMMMFFTFMMHHHHHHHHHHF$$FIIIIIIIFV:\n    ::777777$M8888888888$M999999VVM$$M$MMFFFTTTTTFMMHHHHHHHHHHF$MFIIIFFV*:\n        :77VM$V888888888$M9999999999$$FTTTTTTTTTTFMMHHHHHHHHHHF$MFII*:\n            ::*VV8888888$M9999999999M$MTTTTTTTTTTFM$FHHHHHHHHFV**:\n                :**VV888M$9999999999M$FTTTTTTTTTTFM$HHHHFFV**:\n                    :*VVMM9999999999M$MTTTTTTTTTTFM$HHV**\n                        :*VV99999999M$MTTTTTTTTFFFV*:\n                           :*VVV9999M$MTTTTFFFV*:\n                               :*VV*M$MFFT**:\n                                  :**V*:\n"
-
-rtxOnIndex = ['1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'S', 'C', 'D', 'E', 'X', 'T', 'H', 'I', 'J', 'K', 'L', 'Z', 'N', 'U', 'P', 'Q', '+']
-
-rtxOnCube' :: Int -> String -> String -> String
-rtxOnCube' _ rtxOn [] = rtxOn
-rtxOnCube' i rtxOn (x:xs) = rtxOnCube' (i + 1) (replace (rtxOnIndex !! i) x rtxOn) xs
-
-replace :: Char -> Char -> String -> String
-replace _ _ [] = []
-replace a b (x:xs)
-    | x == a = b : replace a b xs
-    | otherwise = x : replace a b xs
 
 turn ::  [Int] -> Face -> Face
 turn [] _ = []
@@ -333,15 +283,6 @@ moveToAction (MLeft ODirection) = moveL'
 moveToAction (MDown ONothing) = moveD
 moveToAction (MDown OStrokes) = moveD2
 moveToAction (MDown ODirection) = moveD'
-
-allTrueMoves = [MFront ONothing, MFront ODirection, MFront OStrokes, MRight ONothing, MRight ODirection, MRight OStrokes, MUp ONothing, MUp ODirection, MUp OStrokes, MBack ONothing, MBack ODirection, MBack OStrokes, MLeft ONothing, MLeft ODirection, MLeft OStrokes, MDown ONothing, MDown ODirection, MDown OStrokes]
-
-allTrueMovesKey key
-    | key == 0 = allTrueMoves
-    | key == 1 = [MFront ONothing, MFront ODirection, MFront OStrokes, MRight OStrokes, MUp ONothing, MUp ODirection, MUp OStrokes, MBack ONothing, MBack ODirection, MBack OStrokes, MLeft OStrokes, MDown ONothing, MDown ODirection, MDown OStrokes]
-    | key == 2 = [MFront OStrokes, MRight OStrokes, MUp ONothing, MUp ODirection, MUp OStrokes, MBack OStrokes, MLeft OStrokes, MDown ONothing, MDown ODirection, MDown OStrokes]
-    | key == 3 = [MFront OStrokes, MRight OStrokes, MUp OStrokes, MBack OStrokes, MLeft OStrokes, MDown OStrokes]
-    | key == 4 = []
    
 makeMoves :: [Move] -> Cube -> Cube
 makeMoves moves cube = foldl (\ newCube f -> f newCube) cube $ map moveToAction moves
