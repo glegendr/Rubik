@@ -309,7 +309,7 @@ moveB' :: Cube -> Cube
 moveB' myCube = (head myCube):face1:face2:face3:face4:face5:[]
     where
         face1 = [myCube !! downFace !! 6, myCube !! leftFace !! 1, myCube !! leftFace !! 2, myCube !! downFace !! 7, myCube !! leftFace !! 4, myCube !! leftFace !! 5, myCube !! downFace !! 8, myCube !! leftFace !! 7, myCube !! leftFace !! 8]
-        face2 = [myCube !! leftFace !! 0, myCube !! leftFace !! 3, myCube !! leftFace !! 6] ++ drop 3 (myCube !! upFace)
+        face2 = [myCube !! leftFace !! 6, myCube !! leftFace !! 3, myCube !! leftFace !! 0] ++ drop 3 (myCube !! upFace)
         face3 = [myCube !! rightFace !! 0, myCube !! rightFace !! 1, myCube !! upFace !! 0, myCube !! rightFace !! 3, myCube !! rightFace !! 4, myCube !! upFace !! 1, myCube !! rightFace !! 6, myCube !! rightFace !! 7, myCube !! upFace !! 2]
         face4 = take 6 (myCube !! downFace) ++ [myCube !! rightFace !! 8, myCube !! rightFace !! 5, myCube !! rightFace !! 2]
         face5 = turnCounterClock (myCube !! backFace)

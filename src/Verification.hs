@@ -2,7 +2,9 @@ module Verification
 ( testAll
 , group1Verification
 , group2Verification
-, group3Verification)
+, group3Verification
+, getRightLeftCorner
+, getAllEdges)
  where
 
 import Cube
@@ -78,6 +80,10 @@ edgeSide = [[(2, 7), (1, 5), (3, 3), (4, 1)], [(2, 3), (5, 3), (0, 3), (4, 3)], 
 getEdges :: Face -> String
 getEdges face = [face !! 1, face !! 3, face !! 5, face !! 7]
 
+getAllEdges :: Cube -> String
+getAllEdges [] = []
+getAllEdges (x:xs) = getEdges x ++ getAllEdges xs
+
 getEdgeSide :: Cube -> Int -> [Int] -> String
 getEdgeSide _ _ [] = []
 getEdgeSide cube side (x:xs) = cube !! newSide !! newIndex : getEdgeSide cube side xs
@@ -86,7 +92,7 @@ getEdgeSide cube side (x:xs) = cube !! newSide !! newIndex : getEdgeSide cube si
 
 group1Verification :: Cube -> Bool
 group1Verification cube
-    | any (\ z -> z == 'O' || z == 'R') (getEdges faceF) = False -- B G == O R
+    | any (\ z -> z == 'O' || z == 'R') (getEdges faceF) = False
     | any (\ z -> z == 'O' || z == 'R') (getEdges faceB) = False
     where
         faceF = cube !! frontFace
@@ -181,3 +187,18 @@ testAll = do
     putStrLn $ "newCube      True  -> " ++ (show $ isFinished newCube)
     -- putCubeColor cubeTest
    {-- ULUFLF'L'DU2R--}
+
+getRightLeftCorner :: Cube -> String
+getRightLeftCorner cube = (delIndex [1, 7] 0 faceF) ++ (delIndex [1, 7] 0 faceL) ++ (delIndex [1,3,5,7] 0 faceU) ++ (delIndex [1, 7] 0 faceR) ++ (delIndex [1, 7] 0 faceB)
+    where
+        faceF = cube !! frontFace
+        faceL = cube !! leftFace
+        faceU = cube !! upFace
+        faceR = cube !! rightFace
+        faceB = cube !! backFace
+
+delIndex :: [Int] -> Int -> Face -> String
+delIndex [] _ face = face
+delIndex lst@(x:xs) i (y:ys)
+    | i == x = delIndex xs (i + 1) ys
+    | otherwise = y : delIndex lst (i + 1) ys

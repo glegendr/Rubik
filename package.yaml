@@ -23,6 +23,7 @@ dependencies:
 - text
 - rainbow
 - ansi-terminal
+- hashmap
 
 library:
   source-dirs: src

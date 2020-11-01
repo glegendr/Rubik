@@ -13,20 +13,34 @@ import Algo
 
 main :: IO ()
 main = do
-    -- args <- getArgs
-    -- let lexed = lexMe args
-    -- case head lexed of
-    --     LexError str -> alert str
-    --     otherwise -> return ()
-    -- let shuffle = getShuffle lexed
-    -- let shuffeledCube = foldl (\ cube f -> f cube) newCube $ map moveToAction $ map toMove shuffle
+    args <- getArgs
+    let lexed = lexMe args
+    case head lexed of
+        LexError str -> alert str
+        otherwise -> return ()
+    let shuffle = getShuffle lexed
+    --------------- Normal Way
+    -- let shuffeledCube = foldl (\ cube f -> f cube) newCube $ map (moveToAction . toMove) shuffle
     -- putCubeColor shuffeledCube
     -- let ret = algo shuffeledCube
     -- putStrLn $ show $ length ret
     -- putMoves ret
+    -- putCubeColor $ makeMoves ret shuffeledCube
+    --------------- Number Way
+    let shuffeledCube =  foldl (\ cube move -> applyMove move cube) newCube' $ map (moveToInt . toMove) shuffle
+    let shuffeledCube' = foldl (\ cube f -> f cube) newCube $ map (moveToAction . toMove) shuffle
+    putStrLn $ "Shuffeled Cube: " ++ show shuffeledCube
+    putStrLn $ "Length        : " ++ (show $ length shuffeledCube)
+    putStrLn $ "New Cube      : " ++ show newCube'
+    putStrLn $ "Length        : " ++ (show $ length newCube')
+    let ret = algoNumber shuffeledCube
+    putStrLn $ show $ length ret
+    putMoves ret
+    putStrLn $ show $ makeMovesNumber ret shuffeledCube
     ---------------
-    -- putAnimatedCube False shuffeledCube (map moveToAction ret)
-    putStrLn $ show $ makeMoves (take 400000 (repeat (MRight ONothing))) newCube
+    putCubeColor $ makeMoves ret shuffeledCube'
+    -- putAnimatedCube False shuffeledCube' (map moveToAction ret)
+    -- putStrLn $ show $ makeMoves (take 400000 (repeat (MRight ONothing))) newCube
     -- 400000 U - (3.502 + 3.596 + 3.587 + 3.584 + 3.622) / 5 = 3,5782 
     -- 400000 F - (9.117 + 9.017 + 8.968 + 8.929 + 9.023) / 5 = 9,0108 
     -- 400000 R - (11.191 + 10.002 + 10.030 + 9.075 + 9.986) / 5 = 10,0568
