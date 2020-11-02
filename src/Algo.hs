@@ -7,7 +7,7 @@ import Data.List (partition)
 import Data.Maybe (isJust, fromJust)
 import Data.Bits
 
--- Move   
+-- Moves  
 -- U    --> 0
 -- U2   --> 1
 -- U'   --> 2
@@ -24,9 +24,8 @@ import Data.Bits
 -- L2   --> 13
 -- L'   --> 14
 -- R    --> 15
--- R'   --> 17
 -- R2   --> 16
---
+-- R'   --> 17
 
 algo = initBfsNumber [] (-1)
 

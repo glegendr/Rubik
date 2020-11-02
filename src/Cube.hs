@@ -5,6 +5,7 @@ module Cube
 , putCubeColor
 , moveToAction
 , makeMoves
+, allMoves
 ) where
 
 import Moves

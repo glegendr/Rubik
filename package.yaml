@@ -24,6 +24,10 @@ dependencies:
 - rainbow
 - ansi-terminal
 - hashmap
+- time
+- deepseq
+- bytestring
+- hashable
 
 library:
   source-dirs: src

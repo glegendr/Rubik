@@ -6,6 +6,7 @@ module Moves
     , changeDirection
     , moveToInt
     , intToMove
+    , movesToString
     ) where
 
 data Option = ODirection | OStrokes | ONothing deriving (Eq)
@@ -23,14 +24,14 @@ instance Show Move where
     show (MLeft o) = "Left " ++ show o
     show (MDown o) = "Down " ++ show o
 
-moveToString :: [Move] -> String
-moveToString [] = []
-moveToString ((MFront opt):xs) = "F" ++ optionToString opt ++ " " ++ moveToString xs
-moveToString ((MRight opt):xs) = "R" ++ optionToString opt ++ " " ++ moveToString xs
-moveToString ((MUp opt):xs) = "U" ++ optionToString opt ++ " " ++ moveToString xs
-moveToString ((MBack opt):xs) = "B" ++ optionToString opt ++ " " ++ moveToString xs
-moveToString ((MLeft opt):xs) = "L" ++ optionToString opt ++ " " ++ moveToString xs
-moveToString ((MDown opt):xs) = "D" ++ optionToString opt ++ " " ++ moveToString xs
+movesToString :: [Move] -> String
+movesToString [] = []
+movesToString ((MFront opt):xs) = "F" ++ optionToString opt ++ " " ++ movesToString xs
+movesToString ((MRight opt):xs) = "R" ++ optionToString opt ++ " " ++ movesToString xs
+movesToString ((MUp opt):xs) = "U" ++ optionToString opt ++ " " ++ movesToString xs
+movesToString ((MBack opt):xs) = "B" ++ optionToString opt ++ " " ++ movesToString xs
+movesToString ((MLeft opt):xs) = "L" ++ optionToString opt ++ " " ++ movesToString xs
+movesToString ((MDown opt):xs) = "D" ++ optionToString opt ++ " " ++ movesToString xs
 
 optionToString :: Option -> String
 optionToString ODirection = "\'"
@@ -38,7 +39,7 @@ optionToString OStrokes = "2"
 optionToString ONothing = []
 
 putMoves :: [Move] -> IO ()
-putMoves = putStrLn . moveToString
+putMoves = putStrLn . movesToString
 
 toMove :: String -> Move
 toMove str
