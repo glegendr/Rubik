@@ -20,6 +20,7 @@ import Data.Time
 import Data.ByteString as Bs (hGetLine, ByteString)
 import Data.Hashable
 import System.IO
+import System.Random
 
 data Lex = LexError !String | LexFlag !String !String | LexMoves ![String] deriving (Eq)
 allFlags = allFlagsNoArg ++ allFlagsArg
@@ -185,7 +186,7 @@ createShuffle :: String -> IO ()
 createShuffle str = do
     let filtered = filter (isNumber) str
     let readed = read str
-    if not $ all (isNumber) str || filtered == []
+    if (length filtered) == 0 || (not $ all (isNumber) str)
     then (do
         putStrLn "Error: Wrong argument given"
         exitWith (ExitFailure 2))
@@ -194,11 +195,8 @@ createShuffle str = do
         putStrLn "Error: Argument to big"
         exitWith (ExitFailure 2))
     else return ()
-    handle <- openFile "/dev/random" ReadMode  
-    lines <- getMultipleLines readed [] handle
-    hClose handle
-    let salts = map (abs . hash) lines
-    putMoves $ map intToMove $ createList salts (-1) (-1)
+    random_lst <- sequence $ replicate readed $ randomRIO (1,50::Int)
+    putMoves $ map intToMove $ createList random_lst (-1) (-1)
 
 createList :: [Int] -> Int -> Int -> [Int]
 createList [] _ _ = []

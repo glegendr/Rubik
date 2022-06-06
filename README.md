@@ -84,6 +84,5 @@ The interactive mode create a new cube and let you give instruction as folow:
 ### Help Flag
 ```./Rubik -h```
 This flag display a help message
-## Authors
-[@lojesu](https://github.com/lojesu/).   
+## Author
 [@glegendr](https://github.com/glegendr/). 
